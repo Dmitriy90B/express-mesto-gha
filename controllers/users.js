@@ -47,7 +47,7 @@ const createUser = async (req, res) => {
     const userCreate = new User({ name, about, avatar });
     res.status(201).send(await userCreate.save());
   } catch (err) {
-    if (err.errors.name.name === 'ValidationError') {
+    if (err.name === 'ValidationError') {
       res.status(400).send({
         message: `${Object.values(err.errors)
           .map((error) => error.message)
