@@ -1,20 +1,20 @@
-const user = require("../models/user");
+const User = require('../models/user');
 
 // возвращает всех пользователей из базы
 const getUsers = async (req, res) => {
   try {
-    const users = await user.find({});
+    const users = await User.find({});
     res.status(200).send(users);
   } catch (err) {
-    if (err.errors.name.name === "ValidationError") {
+    if (err.errors.name.name === 'ValidationError') {
       res.status(400).send({
-        message: "Ошибка введеных данных",
+        message: 'Ошибка введеных данных',
         err,
       });
       return;
     }
     res.status(500).send({
-      message: "Произошла ошибка в работе сервера",
+      message: 'Произошла ошибка в работе сервера',
       err,
     });
   }
@@ -23,18 +23,18 @@ const getUsers = async (req, res) => {
 // возвращает пользователя по _id
 const getUserById = async (req, res) => {
   try {
-    const userId = await user.findById(req.user._id);
+    const userId = await User.findById(req.user._id);
     res.status(200).send(userId);
   } catch (err) {
-    if (err.king === "ObjectID") {
+    if (err.king === 'ObjectID') {
       res.status(404).send({
-        message: "Пользователя с таким id не найдено",
+        message: 'Пользователя с таким id не найдено',
         err,
       });
       return;
     }
     res.status(500).send({
-      message: "Произошла ошибка в работе сервера",
+      message: 'Произошла ошибка в работе сервера',
       err,
     });
   }
@@ -44,18 +44,18 @@ const getUserById = async (req, res) => {
 const createUser = async (req, res) => {
   try {
     const { name, about, avatar } = req.body;
-    const userCreate = new user({ name, about, avatar });
+    const userCreate = new User({ name, about, avatar });
     res.status(201).send(await userCreate.save());
   } catch (err) {
-    if (err.errors.name.name === "ValidationError") {
+    if (err.errors.name.name === 'ValidationError') {
       res.status(400).send({
-        message: "Ошибка введеных данных",
+        message: 'Ошибка введеных данных',
         err,
       });
       return;
     }
     res.status(500).send({
-      message: "Произошла ошибка в работе сервера",
+      message: 'Произошла ошибка в работе сервера',
       err,
     });
   }
@@ -65,29 +65,29 @@ const createUser = async (req, res) => {
 const updateUser = async (req, res) => {
   try {
     const { name, about } = req.body;
-    const userUpdate = await user.findByIdAndUpdate(
+    const userUpdate = await User.findByIdAndUpdate(
       req.user._id,
       { name, about },
-      { new: true }
+      { new: true },
     );
     res.status(200).send(userUpdate);
   } catch (err) {
-    if (err.name === "ValidationError") {
+    if (err.name === 'ValidationError') {
       res.status(400).send({
-        message: "Переданы некорректные данные при обновлении профиля",
+        message: 'Переданы некорректные данные при обновлении профиля',
         err,
       });
       return;
     }
-    if (err.name === "ObjectID") {
+    if (err.name === 'ObjectID') {
       res.status(404).send({
-        message: "Пользователь с указанным id не найден",
+        message: 'Пользователь с указанным id не найден',
         err,
       });
       return;
     }
     res.status(500).send({
-      message: "Произошла ошибка в работе сервера",
+      message: 'Произошла ошибка в работе сервера',
       err,
     });
   }
@@ -97,29 +97,29 @@ const updateUser = async (req, res) => {
 const updateUserAvatar = async (req, res) => {
   try {
     const { avatar } = req.body;
-    const userId = await user.findByIdAndUpdate(
+    const userId = await User.findByIdAndUpdate(
       req.user._id,
       { avatar },
-      { new: true }
+      { new: true },
     );
     res.status(200).send(userId);
   } catch (err) {
-    if (err.name === "ValidationError") {
+    if (err.name === 'ValidationError') {
       res.status(400).send({
-        message: "Переданы некорректные данные при обновлении аватара",
+        message: 'Переданы некорректные данные при обновлении аватара',
         err,
       });
       return;
     }
-    if (err.name === "ObjectID") {
+    if (err.name === 'ObjectID') {
       res.status(404).send({
-        message: "Пользователь с указанным id не найден",
+        message: 'Пользователь с указанным id не найден',
         err,
       });
       return;
     }
     res.status(500).send({
-      message: "Произошла ошибка в работе сервера",
+      message: 'Произошла ошибка в работе сервера',
       err,
     });
   }
