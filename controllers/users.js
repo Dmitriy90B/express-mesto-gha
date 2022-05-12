@@ -49,8 +49,9 @@ const createUser = async (req, res) => {
   } catch (err) {
     if (err.errors.name.name === 'ValidationError') {
       res.status(400).send({
-        message: 'Ошибка введеных данных',
-        err,
+        message: `${Object.values(err.errors)
+          .map((error) => error.message)
+          .join(', ')}`,
       });
       return;
     }
