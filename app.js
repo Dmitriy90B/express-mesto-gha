@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 
-const path = require('path');
+// const path = require('path');
 // стандартное поведение для ОС
 const { PORT = 3000 } = process.env;
 
@@ -18,7 +18,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.static(path.join(__dirname, 'public')));
+// app.use(express.static(path.join(__dirname, 'public')));
 app.use('/users', userRoutes);
 app.use('/cards', cardRoutes);
 
@@ -29,13 +29,17 @@ async function main() {
   });
 
   app.listen(PORT, () => {
+    // eslint-disable-next-line
     console.log(`Слушаем ${PORT} порт`);
   });
 }
 
-main();
-
 app.use((req, res, next) => {
+  // eslint-disable-next-line
   console.log(req.method, req.url);
+  // next(res.(404).json({mesege: 'Старница не найдена'}))
+
   next();
 });
+
+main();

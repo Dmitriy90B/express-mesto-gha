@@ -69,6 +69,7 @@ const updateUser = async (req, res) => {
       req.user._id,
       { name, about },
       { new: true },
+      { runValidators: true },
     );
     res.status(200).send(userUpdate);
   } catch (err) {
@@ -101,6 +102,7 @@ const updateUserAvatar = async (req, res) => {
       req.user._id,
       { avatar },
       { new: true },
+      { runValidators: true },
     );
     res.status(200).send(userId);
   } catch (err) {
