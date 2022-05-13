@@ -20,13 +20,18 @@ const getUsers = async (req, res) => {
   }
 };
 
-// возвращает пользователя по _id
 const getUserById = async (req, res) => {
   try {
-    const userId = await User.findById(req.user._id);
-    res.status(200).send(userId);
+    const { userId } = req.params;
+    await User.findById(userId).then((user) => {
+      if (!user) {
+        res.status(404).send({ message: 'Такого пользователя не существует' });
+        return;
+      }
+      res.send({ data: user });
+    });
   } catch (err) {
-    if (err.king === 'ObjectID') {
+    if (err.name === 'ObjectID') {
       res.status(404).send({
         message: 'Пользователя с таким id не найдено',
         err,
