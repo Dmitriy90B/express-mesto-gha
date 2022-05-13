@@ -31,8 +31,8 @@ const getUserById = async (req, res) => {
       res.send({ data: user });
     });
   } catch (err) {
-    if (err.name === 'ObjectID') {
-      res.status(404).send({
+    if (err.name === 'CastError') {
+      res.status(400).send({
         message: 'Пользователя с таким id не найдено',
         err,
       });

@@ -70,7 +70,7 @@ const likeCard = async (req, res) => {
       });
       return;
     }
-    if (err.name === 'ObjectID') {
+    if (err.name === 'CastError') {
       res.status(404).send({
         message: 'Передан несуществующий id карточки',
         err,
@@ -100,7 +100,7 @@ const dislikeCard = async (req, res) => {
       });
       return;
     }
-    if (err.name === 'ObjectID') {
+    if (err.name === 'CastError') {
       res.status(404).send({
         message: 'Передан несуществующий id карточки',
         err,
