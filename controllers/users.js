@@ -74,7 +74,13 @@ const updateUser = async (req, res) => {
       { name, about },
       { new: true, runValidators: true },
     );
-    res.status(200).send(userUpdate);
+    if (!userUpdate) {
+      res.status(404).send({
+        message: 'Пользователь с указанным id не найден',
+      });
+      return;
+    }
+    res.status(200).send({ data: userUpdate });
   } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(400).send({
@@ -84,13 +90,7 @@ const updateUser = async (req, res) => {
       });
       return;
     }
-    if (err.name === 'ObjectID') {
-      res.status(404).send({
-        message: 'Пользователь с указанным id не найден',
-        err,
-      });
-      return;
-    }
+
     res.status(500).send({
       message: 'Произошла ошибка в работе сервера',
       err,
@@ -108,16 +108,16 @@ const updateUserAvatar = async (req, res) => {
       { new: true, runValidators: true },
     );
     if (!userId) {
-      res.status(400).send({
-        message: 'Переданы некорректные данные при обновлении аватара',
+      res.status(404).send({
+        message: 'Пользователь с указанным id не найден',
       });
       return;
     }
     res.status(200).send({ data: userId });
   } catch (err) {
     if (err.name === 'CastError') {
-      res.status(404).send({
-        message: 'Пользователь с указанным id не найден',
+      res.status(400).send({
+        message: 'Переданы некорректные данные при обновлении аватара',
         err,
       });
       return;
