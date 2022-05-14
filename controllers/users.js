@@ -74,6 +74,12 @@ const updateUser = async (req, res) => {
       { name, about },
       { new: true, runValidators: true },
     );
+    if (!name || !about) {
+      res.status(404).send({
+        message: 'Пользователь с указанным id не найден',
+      });
+      return;
+    }
     res.status(200).send(userUpdate);
   } catch (err) {
     if (err.name === 'ValidationError') {
@@ -81,13 +87,6 @@ const updateUser = async (req, res) => {
         message: `${Object.values(err.errors)
           .map((error) => error.message)
           .join(', ')}`,
-      });
-      return;
-    }
-    if (err.name === 'CastError') {
-      res.status(404).send({
-        message: 'Пользователь с указанным id не найден',
-        err,
       });
       return;
     }
@@ -107,18 +106,17 @@ const updateUserAvatar = async (req, res) => {
       { avatar },
       { new: true, runValidators: true },
     );
+    if (!avatar) {
+      res.status(404).send({
+        message: 'Пользователь с указанным id не найден',
+      });
+      return;
+    }
     res.status(200).send(userId);
   } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(400).send({
         message: 'Переданы некорректные данные при обновлении аватара',
-        err,
-      });
-      return;
-    }
-    if (err.name === 'CastError') {
-      res.status(404).send({
-        message: 'Пользователь с указанным id не найден',
         err,
       });
       return;
