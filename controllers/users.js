@@ -72,9 +72,9 @@ const updateUser = async (req, res) => {
     const userUpdate = await User.findByIdAndUpdate(
       req.user._id,
       { name, about },
-      { new: true, runValidators: true, upsert: false },
+      { new: true, runValidators: true },
     );
-    res.status(200).send({ data: userUpdate });
+    res.status(200).send(userUpdate);
   } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(400).send({
@@ -84,7 +84,7 @@ const updateUser = async (req, res) => {
       });
       return;
     }
-    if (err.name === 'ObjectID') {
+    if (err.name === 'CastError') {
       res.status(404).send({
         message: 'Пользователь с указанным id не найден',
         err,
@@ -105,9 +105,9 @@ const updateUserAvatar = async (req, res) => {
     const userId = await User.findByIdAndUpdate(
       req.user._id,
       { avatar },
-      { new: true, runValidators: true, upsert: false },
+      { new: true, runValidators: true },
     );
-    res.status(200).send({ data: userId });
+    res.status(200).send(userId);
   } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(400).send({
@@ -116,7 +116,7 @@ const updateUserAvatar = async (req, res) => {
       });
       return;
     }
-    if (err.name === 'ObjectID') {
+    if (err.name === 'CastError') {
       res.status(404).send({
         message: 'Пользователь с указанным id не найден',
         err,
