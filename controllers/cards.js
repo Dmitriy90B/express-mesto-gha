@@ -45,7 +45,7 @@ const deleteCardById = async (req, res) => {
     const cardId = await Card.findByIdAndRemove(req.params.cardId);
     res.status(200).send(cardId);
   } catch (err) {
-    if (err.name === 'ObjectID') {
+    if (err.name === 'ObjectId') {
       res.status(404).send({
         message: 'Карточка с указанным id не найдена',
         err,
@@ -61,18 +61,17 @@ const likeCard = async (req, res) => {
       { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
       { new: true },
     );
+    if (!like) {
+      res.status(404).send({
+        message: 'Передан несуществующий id карточки',
+      });
+      return;
+    }
     res.status(200).send({ data: like });
   } catch (err) {
     if (err.name === 'CastError') {
       res.status(400).send({
         message: 'Переданы некорректные данные для постановки лайка',
-        err,
-      });
-      return;
-    }
-    if (err.statusCode === 404) {
-      res.status(404).send({
-        message: 'Передан несуществующий id карточки',
         err,
       });
       return;
@@ -91,18 +90,17 @@ const dislikeCard = async (req, res) => {
       { $pull: { likes: req.user._id } }, // убрать _id из массива
       { new: true },
     );
+    if (!dislike) {
+      res.status(404).send({
+        message: 'Передан несуществующий id карточки',
+      });
+      return;
+    }
     res.status(200).send({ data: dislike });
   } catch (err) {
     if (err.name === 'CastError') {
       res.status(400).send({
         message: 'Переданы некорректные данные для снятии лайка',
-        err,
-      });
-      return;
-    }
-    if (err.statusCode === 404) {
-      res.status(404).send({
-        message: 'Передан несуществующий id карточки',
         err,
       });
       return;
