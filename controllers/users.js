@@ -74,7 +74,7 @@ const updateUser = async (req, res) => {
       { name, about },
       { new: true, runValidators: true, upsert: false },
     );
-    res.status(200).send({ data: userUpdate});
+    res.status(200).send({ data: userUpdate });
   } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(400).send({
