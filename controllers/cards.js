@@ -41,17 +41,13 @@ const createCard = async (req, res) => {
 };
 
 const deleteCardById = async (req, res) => {
-  try {
-    const cardId = await Card.findByIdAndRemove(req.params.cardId);
-    res.status(200).send(cardId);
-  } catch (err) {
-    if (err.name === 'ObjectId') {
-      res.status(404).send({
-        message: 'Карточка с указанным id не найдена',
-        err,
-      });
-    }
+  const cardId = await Card.findByIdAndRemove(req.params.cardId);
+  if (!cardId) {
+    res.status(404).send({
+      message: 'Карточка с указанным id не найдена',
+    });
   }
+  res.status(200).send(cardId);
 };
 
 const likeCard = async (req, res) => {

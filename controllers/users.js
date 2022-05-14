@@ -22,14 +22,12 @@ const getUsers = async (req, res) => {
 
 const getUserById = async (req, res) => {
   try {
-    const { userId } = req.params;
-    await User.findById(userId).then((user) => {
-      if (!user) {
-        res.status(404).send({ message: 'Такого пользователя не существует' });
-        return;
-      }
-      res.send({ data: user });
-    });
+    const userId = await User.findById(req.params.userId);
+    if (!userId) {
+      res.status(404).send({ message: 'Такого пользователя не существует' });
+      return;
+    }
+    res.status(200).send({ data: userId });
   } catch (err) {
     if (err.name === 'CastError') {
       res.status(400).send({
