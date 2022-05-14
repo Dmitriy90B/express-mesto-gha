@@ -107,16 +107,15 @@ const updateUserAvatar = async (req, res) => {
       { avatar },
       { new: true, runValidators: true },
     );
-    res.status(200).send(userId);
-  } catch (err) {
-    if (err.name === 'ValidationError') {
+    if (!userId) {
       res.status(400).send({
         message: 'Переданы некорректные данные при обновлении аватара',
-        err,
       });
       return;
     }
-    if (err.name === 'ObjectID') {
+    res.status(200).send({ data: userId });
+  } catch (err) {
+    if (err.name === 'CastError') {
       res.status(404).send({
         message: 'Пользователь с указанным id не найден',
         err,
