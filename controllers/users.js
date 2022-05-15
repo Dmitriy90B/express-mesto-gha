@@ -29,9 +29,9 @@ const getUserById = async (req, res) => {
     }
     res.status(200).send({ data: userId });
   } catch (err) {
-    if (err.name === 'CastError') {
+    if (err.name === 'ValidationError') {
       res.status(400).send({
-        message: 'Пользователя с таким id не найдено',
+        message: 'Переданы некорректные данные при создании пользователя',
         err,
       });
       return;
@@ -74,12 +74,6 @@ const updateUser = async (req, res) => {
       { name, about },
       { new: true, runValidators: true },
     );
-    if (!name || !about) {
-      res.status(404).send({
-        message: 'Пользователь с указанным id не найден',
-      });
-      return;
-    }
     res.status(200).send(userUpdate);
   } catch (err) {
     if (err.name === 'ValidationError') {
@@ -106,12 +100,6 @@ const updateUserAvatar = async (req, res) => {
       { avatar },
       { new: true, runValidators: true },
     );
-    if (!avatar) {
-      res.status(404).send({
-        message: 'Пользователь с указанным id не найден',
-      });
-      return;
-    }
     res.status(200).send(userId);
   } catch (err) {
     if (err.name === 'ValidationError') {
