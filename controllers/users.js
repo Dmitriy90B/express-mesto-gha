@@ -29,7 +29,7 @@ const getUserById = async (req, res) => {
     }
     res.status(200).send({ data: userId });
   } catch (err) {
-    if (err.name === 'ValidationError') {
+    if (err.name === 'CastError') {
       res.status(400).send({
         message: 'Переданы некорректные данные при создании пользователя',
         err,
@@ -84,6 +84,13 @@ const updateUser = async (req, res) => {
       });
       return;
     }
+    if (err.name === 'CastError') {
+      res.status(400).send({
+        message: 'Пользователь с указанным id не найден',
+        err,
+      });
+      return;
+    }
     res.status(500).send({
       message: 'Произошла ошибка в работе сервера',
       err,
@@ -105,6 +112,13 @@ const updateUserAvatar = async (req, res) => {
     if (err.name === 'ValidationError') {
       res.status(400).send({
         message: 'Переданы некорректные данные при обновлении аватара',
+        ...err,
+      });
+      return;
+    }
+    if (err.name === 'CastError') {
+      res.status(400).send({
+        message: 'Пользователь с указанным id не найден',
         err,
       });
       return;
