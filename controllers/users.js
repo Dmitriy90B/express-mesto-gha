@@ -6,16 +6,8 @@ const getUsers = async (req, res) => {
     const users = await User.find({});
     res.status(200).send(users);
   } catch (err) {
-    if (err.errors.name.name === 'ValidationError') {
-      res.status(400).send({
-        message: 'Ошибка введеных данных',
-        err,
-      });
-      return;
-    }
     res.status(500).send({
       message: 'Произошла ошибка в работе сервера',
-      err,
     });
   }
 };
@@ -31,14 +23,12 @@ const getUserById = async (req, res) => {
   } catch (err) {
     if (err.name === 'CastError') {
       res.status(400).send({
-        message: 'Переданы некорректные данные при создании пользователя',
-        err,
+        message: 'Пользователя с таким id не найдено',
       });
       return;
     }
     res.status(500).send({
       message: 'Произошла ошибка в работе сервера',
-      err,
     });
   }
 };
@@ -60,56 +50,56 @@ const createUser = async (req, res) => {
     }
     res.status(500).send({
       message: 'Произошла ошибка в работе сервера',
-      err,
     });
   }
 };
 
 // обновляет профиль
-const updateUser = (req, res) => {
-  const { name, about } = req.body;
-  User.findByIdAndUpdate(
-    req.user._id,
-    { name, about },
-    { new: true, runValidators: true },
-  )
-    .then((user) => res.status(200).send(user))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({
-          message: 'Переданы некорректные данные при обновлении пользователя.',
-        });
-        return;
-      }
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Пользователь с указанным id не найден' });
-        return;
-      }
-      res.status(500).send({ message: 'Произошла ошибка в работе сервера' });
+const updateUser = async (req, res) => {
+  try {
+    const { name, about } = req.body;
+    const userUpdate = await User.findByIdAndUpdate(
+      req.user._id,
+      { name, about },
+      { new: true, runValidators: true },
+    );
+    res.status(200).send(userUpdate);
+  } catch (err) {
+    if (err.name === 'ValidationError') {
+      res.status(400).send({
+        message: `${Object.values(err.errors)
+          .map((error) => error.message)
+          .join(', ')}`,
+      });
+      return;
+    }
+    res.status(500).send({
+      message: 'Произошла ошибка в работе сервера',
     });
+  }
 };
 
-const updateUserAvatar = (req, res) => {
-  const { avatar } = req.body;
-  User.findByIdAndUpdate(
-    req.user._id,
-    { avatar },
-    { new: true, runValidators: true },
-  )
-    .then((user) => res.status(200).send(user))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({
-          message: 'Переданы некорректные данные при обновлении аватара',
-        });
-        return;
-      }
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Пользователь с указанным id не найден' });
-        return;
-      }
-      res.status(500).send({ message: 'Произошла ошибка в работе сервера' });
+// обновляет аватар
+const updateUserAvatar = async (req, res) => {
+  try {
+    const { avatar } = req.body;
+    const userId = await User.findByIdAndUpdate(
+      req.user._id,
+      { avatar },
+      { new: true, runValidators: true },
+    );
+    res.status(200).send(userId);
+  } catch (err) {
+    if (err.name === 'ValidationError') {
+      res.status(400).send({
+        message: 'Переданы некорректные данные при обновлении аватара',
+      });
+      return;
+    }
+    res.status(500).send({
+      message: 'Произошла ошибка в работе сервера',
     });
+  }
 };
 
 module.exports = {

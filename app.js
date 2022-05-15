@@ -1,10 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 
-// const path = require('path');
-// стандартное поведение для ОС
 const { PORT = 3000 } = process.env;
-
 const { userRoutes } = require('./routes/users');
 const { cardRoutes } = require('./routes/cards');
 
@@ -18,9 +15,12 @@ app.use((req, res, next) => {
   next();
 });
 
-// app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json());
 app.use('/users', userRoutes);
 app.use('/cards', cardRoutes);
+app.use((req, res) => {
+  res.status(404).send({ message: 'Страница не найдена' });
+});
 
 async function main() {
   await mongoose.connect('mongodb://localhost:27017/mestodb', {
@@ -33,11 +33,5 @@ async function main() {
     console.log(`Слушаем ${PORT} порт`);
   });
 }
-
-app.use((req, res, next) => {
-  // eslint-disable-next-line
-  console.log(req.method, req.url);
-  next();
-});
 
 main();

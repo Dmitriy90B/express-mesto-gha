@@ -5,16 +5,8 @@ const getCards = async (req, res) => {
     const users = await Card.find({});
     res.status(200).send(users);
   } catch (err) {
-    if (err.errors.name.name === 'ValidationError') {
-      res.status(400).send({
-        message: 'Ошибка введеных данных',
-        err,
-      });
-      return;
-    }
     res.status(500).send({
       message: 'Произошла ошибка в работе сервера',
-      err,
     });
   }
 };
@@ -29,13 +21,11 @@ const createCard = async (req, res) => {
     if (err.name === 'ValidationError') {
       res.status(400).send({
         message: 'Ошибка введеных данных',
-        err,
       });
       return;
     }
     res.status(500).send({
       message: 'Произошла ошибка в работе сервера',
-      err,
     });
   }
 };
@@ -51,15 +41,10 @@ const deleteCardById = async (req, res) => {
     res.status(200).send(cardId);
   } catch (err) {
     if (err.name === 'CastError') {
-      res.status(400).send({
-        message: 'Переданы некорректные данные для удаление КАРТОЧКИ',
-        err,
-      });
-      return;
+      res.status(400).send({ message: 'Невалидный id' });
     }
     res.status(500).send({
       message: 'Произошла ошибка в работе сервера',
-      err,
     });
   }
 };
@@ -82,13 +67,11 @@ const likeCard = async (req, res) => {
     if (err.name === 'CastError') {
       res.status(400).send({
         message: 'Переданы некорректные данные для постановки лайка',
-        err,
       });
       return;
     }
     res.status(500).send({
       message: 'Произошла ошибка в работе сервера',
-      err,
     });
   }
 };
@@ -111,13 +94,11 @@ const dislikeCard = async (req, res) => {
     if (err.name === 'CastError') {
       res.status(400).send({
         message: 'Переданы некорректные данные для снятии лайка',
-        err,
       });
       return;
     }
     res.status(500).send({
       message: 'Произошла ошибка в работе сервера',
-      err,
     });
   }
 };
