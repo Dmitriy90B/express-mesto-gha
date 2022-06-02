@@ -25,7 +25,7 @@ const createCard = async (req, res) => {
       return;
     }
     res.status(500).send({
-      message: 'Произошла ошибка в работе сервера',
+      message: '1Произошла ошибка в работе сервера',
     });
   }
 };
@@ -37,11 +37,13 @@ const deleteCardById = async (req, res) => {
       res.status(404).send({
         message: 'Карточка с указанным id не найдена',
       });
+      return;
     }
     res.status(200).send(cardId);
   } catch (err) {
     if (err.name === 'CastError') {
       res.status(400).send({ message: 'Невалидный id' });
+      return;
     }
     res.status(500).send({
       message: 'Произошла ошибка в работе сервера',

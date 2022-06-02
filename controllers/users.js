@@ -1,9 +1,9 @@
 /* eslint-disable no-constant-condition */
 /* eslint-disable no-cond-assign */
 /* eslint-disable consistent-return */
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
-const { getToken, isAuthorization } = require('../utils/jwt');
 
 const createUser = async (req, res) => {
   const {
@@ -40,26 +40,20 @@ const createUser = async (req, res) => {
 
 const login = async (req, res) => {
   const { email, password } = req.body;
-  if (!email || !password) {
-    res.status(400).send({ message: '0Неверный логин или пароль' });
-    return;
-  }
   try {
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
-      res.status(401).send({ message: '1Неверный логин или пароль' });
+      res.status(401).send({ message: 'Неверный логин или пароль' });
       return;
     }
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
-      res.status(401).send({ message: '2Неверный логин или пароль' });
+      res.status(401).send({ message: 'Неверный логин или пароль' });
       return;
     }
-    // res.status(200).send({
-    //   token: jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' }),
-    // });
-    const token = await getToken(user._id);
-    res.status(200).send({ token });
+    res.status(200).send({
+      token: jwt.sign({ _id: user._id }, 'some-secret', { expiresIn: '7d' }),
+    });
   } catch (err) {
     res.status(500).send({
       message: 'Произошла ошибка в работе сервера',
@@ -68,10 +62,6 @@ const login = async (req, res) => {
 };
 
 const getUsers = async (req, res) => {
-  const isAuth = await isAuthorization(req.headers.authorization);
-  if (!isAuth) {
-    return res.status(401).send({ message: 'Нет доступа к пользователям' });
-  }
   try {
     const users = await User.find({});
     res.status(200).send(users);
@@ -83,14 +73,10 @@ const getUsers = async (req, res) => {
 };
 
 const getUser = async (req, res) => {
-  const isAuth = await isAuthorization(req.headers.authorization);
-  if (!isAuth) {
-    return res.status(401).send({ message: 'НЕТ доступа к профилю' });
-  }
   try {
-    const user = await User.findOne({ id: req.params.id });
+    const user = await User.findById(req.user._id);
     if (!user) {
-      res.status(404).send({ message: 'ТАКОГО пользователя не существует' });
+      res.status(404).send({ message: 'Такого пользователя не существует' });
       return;
     }
     res.status(200).send({ data: user });
@@ -108,10 +94,6 @@ const getUser = async (req, res) => {
 };
 
 const getUserById = async (req, res) => {
-  const isAuth = await isAuthorization(req.headers.authorization);
-  if (!isAuth) {
-    return res.status(401).send({ message: 'Нет доступа к профилю' });
-  }
   try {
     const userId = await User.findById(req.params.userId);
     if (!userId) {

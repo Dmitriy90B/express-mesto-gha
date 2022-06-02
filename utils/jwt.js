@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = '35ebcfwd456jhigyua7578f891dw184b6c621c51b';
+const JWT_SECRET = 'jasioyjkmnvmjuqnnsloabqawdwq';
 // eslint-disable-next-line no-return-await
 const getToken = async (id) => await jwt.sign({ id }, JWT_SECRET, { expiresIn: '7d' });
 
