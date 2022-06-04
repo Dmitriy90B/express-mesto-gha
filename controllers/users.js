@@ -1,6 +1,5 @@
 /* eslint-disable no-constant-condition */
 /* eslint-disable no-cond-assign */
-/* eslint-disable consistent-return */
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
@@ -22,7 +21,9 @@ const createUser = async (req, res) => {
       about,
       avatar,
     });
-    res.status(201).send(await userCreate.save());
+    const savedUser = await userCreate.save();
+    const { password: removedPassword, ...result } = savedUser.toObject();
+    res.status(201).send(result);
   } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(400).send({

@@ -15,7 +15,7 @@ userRoutes.get('/', getUsers);
 userRoutes.get('/me', getUser);
 userRoutes.get('/:userId', celebrate({
   params: Joi.object().keys({
-    password: Joi.string().required().length(24),
+    userId: Joi.string().required().length(24),
   }),
 }), getUserById);
 userRoutes.patch('/me', celebrate({

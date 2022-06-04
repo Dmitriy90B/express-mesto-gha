@@ -30,7 +30,7 @@ app.post('/signin', celebrate({
 
 app.use('/users', auth, userRoutes);
 app.use('/cards', auth, cardRoutes);
-app.use((req, res) => {
+app.use(auth, (req, res) => {
   res.status(404).send({ message: 'Страница не найдена' });
 });
 

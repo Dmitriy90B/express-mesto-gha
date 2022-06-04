@@ -14,9 +14,9 @@ const getCards = async (req, res) => {
 const createCard = async (req, res) => {
   try {
     const { name, link } = req.body;
-    res
-      .status(201)
-      .send(await Card.create({ name, link, owner: req.user._id }));
+    const card = await Card.create({ name, link, owner: req.user._id });
+    const { _id, ...result } = card.toObject();
+    res.status(201).send(result);
   } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(400).send({
@@ -25,21 +25,28 @@ const createCard = async (req, res) => {
       return;
     }
     res.status(500).send({
-      message: '1Произошла ошибка в работе сервера',
+      message: 'Произошла ошибка в работе сервера',
     });
   }
 };
 
 const deleteCardById = async (req, res) => {
   try {
-    const cardId = await Card.findByIdAndRemove(req.params.cardId);
+    const cardId = await Card.findById(req.params.cardId);
     if (!cardId) {
       res.status(404).send({
         message: 'Карточка с указанным id не найдена',
       });
       return;
     }
-    res.status(200).send(cardId);
+    if (!cardId.owner.equals(req.user._id)) {
+      res.status(403).send({
+        message: 'Чужая карточка',
+      });
+      return;
+    }
+    const cardRemove = await Card.findByIdAndRemove(cardId);
+    res.status(200).send(cardRemove);
   } catch (err) {
     if (err.name === 'CastError') {
       res.status(400).send({ message: 'Невалидный id' });
