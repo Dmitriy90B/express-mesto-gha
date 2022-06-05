@@ -7,6 +7,8 @@ const { PORT = 3000 } = process.env;
 const { userRoutes } = require('./routes/users');
 const { cardRoutes } = require('./routes/cards');
 const { createUser, login } = require('./controllers/users');
+const NotFoundError = require('./errors/NotFoundError');
+const ErrorHandler = require('./errors/ErrorHandler');
 
 const app = express();
 
@@ -30,8 +32,8 @@ app.post('/signin', celebrate({
 
 app.use('/users', auth, userRoutes);
 app.use('/cards', auth, cardRoutes);
-app.use(auth, (req, res) => {
-  res.status(404).send({ message: 'Страница не найдена' });
+app.use(auth, () => {
+  throw new NotFoundError('Страница не найдена');
 });
 
 async function main() {
@@ -47,11 +49,6 @@ async function main() {
 }
 
 app.use(errors());
-
-app.use((req, res, next) => {
-  // eslint-disable-next-line
-  console.log(req.method, req.url);
-  next();
-});
+app.use(ErrorHandler);
 
 main();
