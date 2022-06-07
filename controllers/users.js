@@ -55,7 +55,7 @@ const login = async (req, res, next) => {
       return;
     }
     res.status(200).send({
-      token: jwt.sign({ _id: user._id }, 'super-strong', { expiresIn: '7d' }),
+      token: jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' }),
     });
   } catch (err) {
     next(err);
