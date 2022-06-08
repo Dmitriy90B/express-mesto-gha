@@ -13,10 +13,10 @@ const getCards = async (req, res, next) => {
 };
 
 const createCard = async (req, res, next) => {
+  const { name, link } = req.body;
+  const card = await Card.create({ name, link, owner: req.user._id });
+  const { _id, ...result } = card.toObject();
   try {
-    const { name, link } = req.body;
-    const card = await Card.create({ name, link, owner: req.user._id });
-    const { _id, ...result } = card.toObject();
     res.status(201).send(result);
   } catch (err) {
     if (err.name === 'ValidationError') {
@@ -39,7 +39,7 @@ const deleteCardById = async (req, res, next) => {
   }
   try {
     const cardRemove = await Card.findByIdAndRemove(cardId);
-    res.status(200).send(cardRemove);
+    res.status(200).send({ cardRemove });
   } catch (err) {
     if (err.name === 'CastError') {
       next(new BadRequestError('Невалидный id'));
@@ -60,7 +60,7 @@ const likeCard = async (req, res, next) => {
     return;
   }
   try {
-    res.status(200).send({ data: like });
+    res.status(200).send({ like });
   } catch (err) {
     if (err.name === 'CastError') {
       next(new BadRequestError('Переданы некорректные данные для постановки лайка'));
@@ -81,7 +81,7 @@ const dislikeCard = async (req, res, next) => {
     return;
   }
   try {
-    res.status(200).send({ data: dislike });
+    res.status(200).send({ dislike });
   } catch (err) {
     if (err.name === 'CastError') {
       next(new BadRequestError('Переданы некорректные данные для снятии лайка'));
