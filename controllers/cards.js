@@ -16,7 +16,7 @@ const createCard = async (req, res, next) => {
   const { name, link } = req.body;
   const card = await Card.create({ name, link, owner: req.user._id });
   try {
-    const { _id: removedId, ...result } = card.toObject();
+    const { _id, ...result } = card.toObject();
     res.status(201).send(result);
   } catch (err) {
     if (err.name === 'ValidationError') {
@@ -28,18 +28,17 @@ const createCard = async (req, res, next) => {
 };
 
 const deleteCardById = async (req, res, next) => {
-  const cardId = await Card.findById(req.params.cardId);
-  if (!cardId) {
-    next(new NotFoundError('Карточка с указанным id не найдена'));
-    return;
-  }
-  if (!cardId.owner.equals(req.user._id)) {
-    next(new ForbiddenError('Чужая карточка'));
-    return;
-  }
   try {
-    const cardRemove = await Card.findByIdAndRemove(cardId);
-    res.status(200).send(cardRemove);
+    const cardId = await Card.findById(req.params.cardId);
+    if (!cardId) {
+      next(new NotFoundError('Карточка с указанным id не найдена'));
+      return;
+    }
+    if (!cardId.owner.equals(req.user._id)) {
+      next(new ForbiddenError('Чужая карточка'));
+      return;
+    }
+    res.status(200).send(await Card.findByIdAndRemove(cardId));
   } catch (err) {
     if (err.name === 'CastError') {
       next(new BadRequestError('Невалидный id'));
@@ -58,9 +57,9 @@ const likeCard = async (req, res, next) => {
     );
     if (!like) {
       next(new NotFoundError('Передан несуществующий id карточки'));
-      return;
+    } else {
+      res.status(200).send(like);
     }
-    res.status(200).send(like);
   } catch (err) {
     if (err.name === 'CastError') {
       next(new BadRequestError('Переданы некорректные данные для постановки лайка'));
@@ -79,9 +78,9 @@ const dislikeCard = async (req, res, next) => {
     );
     if (!dislike) {
       next(new NotFoundError('Передан несуществующий id карточки'));
-      return;
+    } else {
+      res.status(200).send(dislike);
     }
-    res.status(200).send(dislike);
   } catch (err) {
     if (err.name === 'CastError') {
       next(new BadRequestError('Переданы некорректные данные для снятии лайка'));
