@@ -43,17 +43,17 @@ const createUser = async (req, res, next) => {
 
 const login = async (req, res, next) => {
   const { email, password } = req.body;
+  const user = await User.findOne({ email }).select('+password');
+  if (!user) {
+    next(new UnauthorizedError('Неверный логин или пароль'));
+    return;
+  }
+  const isValidPassword = await bcrypt.compare(password, user.password);
+  if (!isValidPassword) {
+    next(new UnauthorizedError('Неверный логин или пароль'));
+    return;
+  }
   try {
-    const user = await User.findOne({ email }).select('+password');
-    if (!user) {
-      next(new UnauthorizedError('Неверный логин или пароль'));
-      return;
-    }
-    const isValidPassword = await bcrypt.compare(password, user.password);
-    if (!isValidPassword) {
-      next(new UnauthorizedError('Неверный логин или пароль'));
-      return;
-    }
     res.status(200).send({
       token: jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' }),
     });
@@ -72,14 +72,14 @@ const getUsers = async (req, res, next) => {
 };
 
 const getUser = async (req, res, next) => {
+  const user = await User.findById(req.user._id);
   try {
-    const user = await User.findById(req.user._id);
+    res.status(200).send({ data: user });
+  } catch (err) {
     if (!user) {
       next(new NotFoundError('Такого пользователя не существует'));
       return;
     }
-    res.status(200).send({ data: user });
-  } catch (err) {
     if (err.name === 'CastError') {
       next(new BadRequestError('Пользователя не найдено'));
       return;
@@ -89,12 +89,12 @@ const getUser = async (req, res, next) => {
 };
 
 const getUserById = async (req, res, next) => {
+  const userId = await User.findById(req.params.userId);
+  if (!userId) {
+    next(new NotFoundError('Такого пользователя не существует'));
+    return;
+  }
   try {
-    const userId = await User.findById(req.params.userId);
-    if (!userId) {
-      next(new NotFoundError('Такого пользователя не существует'));
-      return;
-    }
     res.status(200).send({ data: userId });
   } catch (err) {
     if (err.name === 'CastError') {

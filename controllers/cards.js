@@ -28,16 +28,16 @@ const createCard = async (req, res, next) => {
 };
 
 const deleteCardById = async (req, res, next) => {
+  const cardId = await Card.findById(req.params.cardId);
+  if (!cardId) {
+    next(new NotFoundError('Карточка с указанным id не найдена'));
+    return;
+  }
+  if (!cardId.owner.equals(req.user._id)) {
+    next(new ForbiddenError('Чужая карточка'));
+    return;
+  }
   try {
-    const cardId = await Card.findById(req.params.cardId);
-    if (!cardId) {
-      next(new NotFoundError('Карточка с указанным id не найдена'));
-      return;
-    }
-    if (!cardId.owner.equals(req.user._id)) {
-      next(new ForbiddenError('Чужая карточка'));
-      return;
-    }
     const cardRemove = await Card.findByIdAndRemove(cardId);
     res.status(200).send(cardRemove);
   } catch (err) {
@@ -50,16 +50,16 @@ const deleteCardById = async (req, res, next) => {
 };
 
 const likeCard = async (req, res, next) => {
+  const like = await Card.findByIdAndUpdate(
+    req.params.cardId,
+    { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
+    { new: true },
+  );
+  if (!like) {
+    next(new NotFoundError('Передан несуществующий id карточки'));
+    return;
+  }
   try {
-    const like = await Card.findByIdAndUpdate(
-      req.params.cardId,
-      { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
-      { new: true },
-    );
-    if (!like) {
-      next(new NotFoundError('Передан несуществующий id карточки'));
-      return;
-    }
     res.status(200).send({ data: like });
   } catch (err) {
     if (err.name === 'CastError') {
@@ -71,16 +71,16 @@ const likeCard = async (req, res, next) => {
 };
 
 const dislikeCard = async (req, res, next) => {
+  const dislike = await Card.findByIdAndUpdate(
+    req.params.cardId,
+    { $pull: { likes: req.user._id } }, // убрать _id из массива
+    { new: true },
+  );
+  if (!dislike) {
+    next(new NotFoundError('Передан несуществующий id карточки'));
+    return;
+  }
   try {
-    const dislike = await Card.findByIdAndUpdate(
-      req.params.cardId,
-      { $pull: { likes: req.user._id } }, // убрать _id из массива
-      { new: true },
-    );
-    if (!dislike) {
-      next(new NotFoundError('Передан несуществующий id карточки'));
-      return;
-    }
     res.status(200).send({ data: dislike });
   } catch (err) {
     if (err.name === 'CastError') {

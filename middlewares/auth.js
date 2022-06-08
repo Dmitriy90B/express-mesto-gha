@@ -6,7 +6,7 @@ module.exports = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    next(new UnauthorizedError('Необходима авторизация'));
+    next(new UnauthorizedError('1 Необходима авторизация'));
     return;
   }
 
@@ -14,7 +14,7 @@ module.exports = (req, res, next) => {
   let payload;
 
   try {
-    payload = jwt.verify(token, 'super-strong-secret');
+    payload = jwt.verify(token, 'some-secret-key');
   } catch (err) {
     next(new UnauthorizedError('Необходима авторизация'));
     return;
@@ -23,3 +23,5 @@ module.exports = (req, res, next) => {
   req.user = payload;
   next();
 };
+// Ты шифруешь ключ с помощью секрета some-secret-key
+// а дешифруешь super-strong-secret
